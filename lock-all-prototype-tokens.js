@@ -1,4 +1,4 @@
-inew Dialog({
+new Dialog({
   title: "Lock Prototype Token Rotation",
   content: `
     <p>This will <strong>lock art rotation on prototype tokens</strong> for
