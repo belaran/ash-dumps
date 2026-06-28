@@ -7,38 +7,30 @@ new Dialog({
         <input type="text" name="sceneName" placeholder="Nom de la scène" style="width:100%"/>
       </div>
       <div class="form-group">
-        <label>URL de l'image :</label>
-        <input type="text" name="imgUrl" placeholder="https://..." style="width:100%"/>
+        <label>Image :</label>
+        <input type="file" name="imgFile" accept="image/*" style="width:100%"/>
       </div>
     </form>
   `,
   buttons: {
     create: {
       icon: '<i class="fas fa-image"></i>',
-      label: "Télécharger & créer",
+      label: "Uploader & créer",
       callback: async (html) => {
-        const imgUrl = html.find('input[name="imgUrl"]').val();
+        const fileInput = html.find('input[name="imgFile"]')[0];
         let sceneName = html.find('input[name="sceneName"]').val();
 
-        if (!imgUrl) {
-          ui.notifications.error("Veuillez entrer une URL valide.");
+        if (!fileInput.files || fileInput.files.length === 0) {
+          ui.notifications.error("Veuillez sélectionner une image.");
           return;
         }
 
         try {
-          /* ---------------- Téléchargement image ---------------- */
-          const response = await fetch(imgUrl);
-          if (!response.ok) throw new Error("Téléchargement impossible");
+          const file = fileInput.files[0];
 
-          const blob = await response.blob();
-          const fileName = decodeURIComponent(
-            imgUrl.split("/").pop().split("?")[0]
-          );
+          if (!sceneName) sceneName = file.name;
 
-          if (!sceneName) sceneName = fileName;
-
-          const file = new File([blob], fileName, { type: blob.type });
-
+          /* ---------------- Upload image ---------------- */
           const upload = await FilePicker.upload(
             "data",
             "img/cthulhu-hack/le-buste-du-pseudo-seneque",
@@ -82,7 +74,7 @@ new Dialog({
           };
 
           img.onerror = () => {
-            ui.notifications.error("Image téléchargée mais impossible de la charger.");
+            ui.notifications.error("Image uploadée mais impossible de la charger.");
           };
 
         } catch (err) {
